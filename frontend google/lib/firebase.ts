@@ -22,7 +22,9 @@ googleProvider.setCustomParameters({
   prompt: 'select_account',
 });
 
-export const db: Firestore = getFirestore(app, firebaseConfig.firestoreDatabaseId || undefined);
+export const db: Firestore = firebaseConfig.firestoreDatabaseId
+  ? getFirestore(app, firebaseConfig.firestoreDatabaseId)
+  : getFirestore(app);
 
 /**
  * Sign in with Google OAuth Popup

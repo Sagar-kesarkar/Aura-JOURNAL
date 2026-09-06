@@ -212,4 +212,98 @@ describe('Backend Route Integration Tests: Authorization & Security Hardening', 
     const allowOrigin = res.headers.get('access-control-allow-origin');
     assert.strictEqual(allowOrigin, 'https://aistudio.google.com');
   });
+
+  test('Protected endpoint /api/gemini/threads rejects missing authorization token with 401', async () => {
+    const res = await fetch(`${baseUrl}/api/gemini/threads`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ entries: [] }),
+    });
+    assert.strictEqual(res.status, 401);
+  });
+
+  test('Input validation rejects malformed payload on /api/gemini/threads with 400', async () => {
+    const res = await fetch(`${baseUrl}/api/gemini/threads`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: 'Bearer mock-token-user-a',
+      },
+      body: JSON.stringify({ entries: 'not-an-array' }),
+    });
+    assert.strictEqual(res.status, 400);
+  });
+
+  test('Authorized request to /api/gemini/threads succeeds and returns threads array', async () => {
+    const res = await fetch(`${baseUrl}/api/gemini/threads`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: 'Bearer mock-token-user-a',
+      },
+      body: JSON.stringify({
+        entries: [
+          {
+            id: 'e1',
+            title: 'My First Secure AI Project',
+            date: 'Yesterday',
+            text: 'Built the secure backend and verified rate limiters and auth.',
+            tag: 'Reflection',
+          },
+          {
+            id: 'e2',
+            title: 'test2',
+            date: 'Yesterday',
+            text: 'Testing user workspace and personal reflections.',
+            tag: 'Reflection',
+          },
+        ],
+      }),
+    });
+
+    assert.strictEqual(res.status, 200);
+    const body = await res.json();
+    assert.ok(Array.isArray(body.threads));
+    assert.ok(body.threads.length > 0);
+    assert.ok(body.threads[0].title);
+    assert.ok(body.threads[0].copy);
+    assert.ok(Array.isArray(body.threads[0].entryIds));
+  });
+
+  test('Protected endpoint /api/gemini/review rejects missing authorization token with 401', async () => {
+    const res = await fetch(`${baseUrl}/api/gemini/review`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ entries: [] }),
+    });
+    assert.strictEqual(res.status, 401);
+  });
+
+  test('Authorized request to /api/gemini/review succeeds and returns 4-part review', async () => {
+    const res = await fetch(`${baseUrl}/api/gemini/review`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: 'Bearer mock-token-user-a',
+      },
+      body: JSON.stringify({
+        entries: [
+          {
+            id: 'e1',
+            title: 'My First Secure AI Project',
+            date: 'Yesterday',
+            text: 'Completed milestone with security hardening.',
+          },
+        ],
+      }),
+    });
+
+    assert.strictEqual(res.status, 200);
+    const body = await res.json();
+    assert.ok(body.review);
+    assert.ok(body.review.standout);
+    assert.ok(body.review.load);
+    assert.ok(body.review.action);
+    assert.ok(body.review.positive);
+  });
 });

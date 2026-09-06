@@ -16,6 +16,8 @@ import {
   hashToView,
   samples,
   normalizeEntry,
+  calculateGoalProgress,
+  isGoalStale,
 } from '../app/journal-data.ts';
 class MemoryStorage {
   values = new Map();
@@ -122,6 +124,7 @@ test('every page and entry hash round-trips for refresh and browser navigation',
     'Voice reflection',
     'Overview',
     'History',
+    'Goals',
     'Recurring threads',
     'Weekly review',
     'Settings',
@@ -130,6 +133,60 @@ test('every page and entry hash round-trips for refresh and browser navigation',
   ])
     assert.equal(hashToView(viewToHash(view)), view);
   assert.equal(hashToView('#entry/%ZZ'), 'Overview');
+});
+
+test('calculateGoalProgress derives percentage from milestones or manual percent', () => {
+  // With milestones: derived from done count
+  const withMilestones = {
+    milestones: [
+      { id: '1', label: 'Step 1', done: true },
+      { id: '2', label: 'Step 2', done: false },
+      { id: '3', label: 'Step 3', done: true },
+      { id: '4', label: 'Step 4', done: false },
+    ],
+    progressPercent: null,
+  };
+  assert.equal(calculateGoalProgress(withMilestones), 50);
+
+  // Without milestones: uses manual progressPercent clamped between 0 and 100
+  const withoutMilestones = {
+    milestones: [],
+    progressPercent: 75,
+  };
+  assert.equal(calculateGoalProgress(withoutMilestones), 75);
+
+  const emptyGoal = {
+    milestones: [],
+    progressPercent: null,
+  };
+  assert.equal(calculateGoalProgress(emptyGoal), 0);
+});
+
+test('isGoalStale correctly identifies active goals older than threshold', () => {
+  const threeWeeksAgo = new Date(Date.now() - 22 * 24 * 60 * 60 * 1000).toISOString();
+  const twoDaysAgo = new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString();
+
+  // Active and stale
+  assert.equal(
+    isGoalStale({ status: 'active', lastMentionedAt: threeWeeksAgo, createdAt: threeWeeksAgo }),
+    true
+  );
+
+  // Active and fresh
+  assert.equal(
+    isGoalStale({ status: 'active', lastMentionedAt: twoDaysAgo, createdAt: threeWeeksAgo }),
+    false
+  );
+
+  // Paused or completed goal is never flagged stale
+  assert.equal(
+    isGoalStale({ status: 'paused', lastMentionedAt: threeWeeksAgo, createdAt: threeWeeksAgo }),
+    false
+  );
+  assert.equal(
+    isGoalStale({ status: 'completed', lastMentionedAt: threeWeeksAgo, createdAt: threeWeeksAgo }),
+    false
+  );
 });
 test('reading time uses text length and dates advance with the day', () => {
   assert.equal(readingMinutes('word '.repeat(401)), 3);

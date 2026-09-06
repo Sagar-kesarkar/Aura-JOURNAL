@@ -443,6 +443,7 @@ const routes: Record<string, string> = {
   'Voice reflection': 'voice',
   Overview: 'overview',
   History: 'history',
+  Goals: 'goals',
   'Recurring threads': 'threads',
   'Weekly review': 'review',
   Settings: 'settings',
@@ -466,6 +467,52 @@ export function hashToView(hash: string) {
     }
   }
   return Object.keys(routes).find((k) => routes[k] === raw) || 'Overview';
+}
+
+export type GoalStatus = 'active' | 'completed' | 'paused' | 'abandoned';
+
+export interface GoalMilestone {
+  id: string;
+  label: string;
+  done: boolean;
+}
+
+export interface Goal {
+  id: string;
+  title: string;
+  description: string | null;
+  targetDate: string | null;
+  milestones: GoalMilestone[];
+  status: GoalStatus;
+  progressPercent: number | null; // only used when milestones is empty; user-declared
+  mentionCount: number;
+  relatedSessionIds: string[];
+  lastMentionedAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export function calculateGoalProgress(goal: Pick<Goal, 'milestones' | 'progressPercent'>): number {
+  if (goal.milestones && goal.milestones.length > 0) {
+    const completed = goal.milestones.filter((m) => m.done).length;
+    return Math.round((completed / goal.milestones.length) * 100);
+  }
+  return typeof goal.progressPercent === 'number'
+    ? Math.max(0, Math.min(100, Math.round(goal.progressPercent)))
+    : 0;
+}
+
+export function isGoalStale(
+  goal: Pick<Goal, 'status' | 'lastMentionedAt' | 'createdAt'>,
+  thresholdDays = 14,
+): boolean {
+  if (goal.status !== 'active') return false;
+  const referenceDateStr = goal.lastMentionedAt || goal.createdAt;
+  if (!referenceDateStr) return false;
+  const referenceTime = new Date(referenceDateStr).getTime();
+  if (isNaN(referenceTime)) return false;
+  const daysDiff = (Date.now() - referenceTime) / (1000 * 60 * 60 * 24);
+  return daysDiff >= thresholdDays;
 }
 
 export function remainingDraftAfterSave(

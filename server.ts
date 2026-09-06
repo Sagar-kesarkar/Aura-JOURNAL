@@ -12,10 +12,23 @@ import {
   validateReflectPayload,
   validateSummarizePayload,
   validateAndSanitizeAnalysis,
+  validateThreadsPayload,
+  validateAndSanitizeThreads,
+  validateReviewPayload,
+  validateAndSanitizeReview,
   containsPrototypePollution,
   stripUndefined,
 } from './server/validation';
 import { privacyPreservingLogger } from './server/logger';
+import {
+  listGoals,
+  getGoal,
+  createGoal,
+  updateGoal,
+  deleteGoal,
+  resolveEntryPreviews,
+  type GoalStatus,
+} from './server/goalsStore';
 
 dotenv.config();
 
@@ -399,6 +412,181 @@ Please respond ONLY with a valid JSON object matching this schema:
   }
 });
 
+// Protected: Gemini Cross-Entry Recurring Threads Analysis Endpoint
+app.post('/api/gemini/threads', requireAuth, geminiRateLimiter, async (req, res) => {
+  try {
+    const validation = validateThreadsPayload(req.body);
+    if (validation.error || !validation.entries) {
+      res.status(400).json({ error: validation.error });
+      return;
+    }
+
+    const entries = validation.entries;
+    if (entries.length === 0) {
+      res.json({ threads: [], modelUsed: 'none' });
+      return;
+    }
+
+    const formattedEntries = entries
+      .map(
+        (e, idx) =>
+          `[Entry ${idx + 1}] ID: ${e.id} | Date: ${e.date || 'Unknown'} | Title: "${e.title}"${e.tag ? ` | Tag: ${e.tag}` : ''}\nContent:\n${e.text.slice(0, 1500)}`
+      )
+      .join('\n\n---\n\n');
+
+    const prompt = `You are an empathetic, discerning reflective journal analyst. The user has shared several personal journal reflections across time:
+
+${formattedEntries}
+
+TASK:
+Analyze these authentic reflections to identify 2 to 4 recurring themes, patterns, or "recurring threads" that connect multiple reflections.
+Notice topics the author returns to (e.g. balancing energy and rest, finding creative momentum, navigating interpersonal boundaries, unhurried focus).
+
+Guidelines:
+1. Ground each thread strictly in the user's provided reflections.
+2. Under "entryIds", include the exact ID strings of the entries where this theme appears.
+3. Keep titles evocative, supportive, and non-judgmental (e.g. "Making room for yourself", "Finding rhythm in work").
+4. Under "copy", provide a 1-2 sentence gentle summary describing what shows up across entries.
+5. Under "tag", provide a concise 2-3 word thematic category.
+
+Return ONLY a valid JSON object matching this schema:
+{
+  "threads": [
+    {
+      "id": "slug-id",
+      "title": "Evocative Title",
+      "copy": "1-2 sentence description...",
+      "tag": "Thematic Tag",
+      "entryIds": ["id1", "id2"]
+    }
+  ]
+}`;
+
+    const systemInstruction =
+      'You are a thoughtful, non-judgmental reflective journal analyzer. Treat all user thoughts as authentic private reflections. Return valid JSON only, without markdown fence wrappers or extraneous text.';
+
+    let rawParsed: any = null;
+    let modelUsed = 'fallback';
+
+    try {
+      const result = await generateContentWithFallback(prompt, systemInstruction);
+      modelUsed = result.modelUsed;
+      let cleanJson = result.text.trim();
+      if (cleanJson.startsWith('```json')) {
+        cleanJson = cleanJson.replace(/^```json\s*/, '').replace(/\s*```$/, '');
+      } else if (cleanJson.startsWith('```')) {
+        cleanJson = cleanJson.replace(/^```\s*/, '').replace(/\s*```$/, '');
+      }
+      rawParsed = JSON.parse(cleanJson);
+    } catch (err: any) {
+      console.warn('[Gemini Threads Fallback]', err?.message || err);
+    }
+
+    const sanitizedThreads = validateAndSanitizeThreads(rawParsed, entries);
+
+    res.json({
+      threads: sanitizedThreads,
+      modelUsed,
+    });
+  } catch (error: any) {
+    console.error('Error in /api/gemini/threads:', error?.message || error);
+    res.status(500).json({
+      error: 'Failed to analyze recurring threads with Gemini AI. Please retry.',
+    });
+  }
+});
+
+// Protected: Gemini Cross-Entry Weekly Review Synthesis Endpoint
+app.post('/api/gemini/review', requireAuth, geminiRateLimiter, async (req, res) => {
+  try {
+    const validation = validateThreadsPayload(req.body);
+    if (validation.error || !validation.entries) {
+      res.status(400).json({ error: validation.error });
+      return;
+    }
+
+    const entries = validation.entries;
+    if (entries.length === 0) {
+      res.json({
+        review: validateAndSanitizeReview(null, []),
+        modelUsed: 'none',
+      });
+      return;
+    }
+
+    const formattedEntries = entries
+      .map(
+        (e, idx) =>
+          `[Entry ${idx + 1}] ID: ${e.id} | Date: ${e.date || 'Recent'} | Title: "${e.title}"\nContent:\n${e.text.slice(0, 1500)}`
+      )
+      .join('\n\n---\n\n');
+
+    const prompt = `You are a supportive, calm reflective partner synthesizing a collection of personal journal reflections into a weekly review.
+Entries:
+${formattedEntries}
+
+TASK:
+Synthesize these reflections into exactly 4 calm, constructive sections:
+01 / WHAT STOOD OUT: A 3-6 word evocative title and 2-3 sentences reflecting core patterns, emotional arc, and common threads.
+02 / WHERE THE LOAD IS COMING FROM: 2-3 sentences acknowledging pressures, busy schedules, or tensions named in their entries without diagnosing or criticizing.
+03 / ONE SMALL THING TO TRY: A gentle, practical 15-20 minute idea or step forward inspired by one of their entries. Reference that entry's title and ID.
+04 / SOMETHING THAT WENT WELL: 1-2 sentences honoring a small victory, honest reflection, or moment of connection.
+
+Return ONLY a valid JSON object matching this schema:
+{
+  "dateRange": "e.g. Recent reflections",
+  "standout": {
+    "title": "Finding space in a full week",
+    "text": "Your entries return to..."
+  },
+  "load": {
+    "text": "..."
+  },
+  "action": {
+    "title": "Make the next step specific",
+    "text": "...",
+    "sourceEntryId": "entry-id",
+    "sourceEntryTitle": "Entry Title"
+  },
+  "positive": {
+    "text": "..."
+  }
+}`;
+
+    const systemInstruction =
+      'You are a gentle, observant reflective journal coach. Ground insights in user reflections. Return valid JSON only, without markdown fence wrappers.';
+
+    let rawParsed: any = null;
+    let modelUsed = 'fallback';
+
+    try {
+      const result = await generateContentWithFallback(prompt, systemInstruction);
+      modelUsed = result.modelUsed;
+      let cleanJson = result.text.trim();
+      if (cleanJson.startsWith('```json')) {
+        cleanJson = cleanJson.replace(/^```json\s*/, '').replace(/\s*```$/, '');
+      } else if (cleanJson.startsWith('```')) {
+        cleanJson = cleanJson.replace(/^```\s*/, '').replace(/\s*```$/, '');
+      }
+      rawParsed = JSON.parse(cleanJson);
+    } catch (err: any) {
+      console.warn('[Gemini Review Fallback]', err?.message || err);
+    }
+
+    const sanitizedReview = validateAndSanitizeReview(rawParsed, entries);
+
+    res.json({
+      review: sanitizedReview,
+      modelUsed,
+    });
+  } catch (error: any) {
+    console.error('Error in /api/gemini/review:', error?.message || error);
+    res.status(500).json({
+      error: 'Failed to generate weekly review with Gemini AI. Please retry.',
+    });
+  }
+});
+
 // Protected: Journal Export Endpoint with Strict Owner Access Control
 app.post('/api/journal/export', requireAuth, (req, res) => {
   const authenticatedUid = req.user?.uid;
@@ -436,6 +624,194 @@ app.delete('/api/journal/entry', requireAuth, (req, res) => {
     owner: authenticatedUid,
     message: 'Authorized to delete journal entry',
   });
+});
+
+// ==============================================================================
+// 5. Goals REST API Endpoints (Strictly Scoped to req.user.uid)
+// ==============================================================================
+
+// GET /api/goals — List goals for authenticated user (Active first)
+app.get('/api/goals', requireAuth, async (req, res) => {
+  try {
+    const uid = req.user!.uid;
+    const goals = await listGoals(uid);
+    res.json(goals);
+  } catch (error: any) {
+    console.error('Error in GET /api/goals:', error?.message || error);
+    res.status(500).json({ error: 'Failed to retrieve goals' });
+  }
+});
+
+// POST /api/goals — Create a new goal
+app.post('/api/goals', requireAuth, async (req, res) => {
+  try {
+    const uid = req.user!.uid;
+    const { title, description, targetDate, milestones, status, progressPercent, relatedSessionIds } = req.body || {};
+
+    if (!title || typeof title !== 'string' || !title.trim()) {
+      res.status(400).json({ error: 'Goal title is required and cannot be empty' });
+      return;
+    }
+
+    if (title.trim().length > 180) {
+      res.status(400).json({ error: 'Goal title must be under 180 characters' });
+      return;
+    }
+
+    // Target date cannot be in the past on creation
+    if (targetDate) {
+      const parsedDate = new Date(targetDate);
+      if (isNaN(parsedDate.getTime())) {
+        res.status(400).json({ error: 'Invalid target date format' });
+        return;
+      }
+      const todayMidnight = new Date();
+      todayMidnight.setHours(0, 0, 0, 0);
+      if (parsedDate < todayMidnight) {
+        res.status(400).json({ error: 'Target date cannot be in the past when creating a new goal' });
+        return;
+      }
+    }
+
+    const validStatuses: GoalStatus[] = ['active', 'completed', 'paused', 'abandoned'];
+    const goalStatus: GoalStatus = validStatuses.includes(status) ? status : 'active';
+
+    const goal = await createGoal(uid, {
+      title,
+      description,
+      targetDate,
+      milestones,
+      status: goalStatus,
+      progressPercent,
+      relatedSessionIds,
+    });
+
+    res.status(201).json(goal);
+  } catch (error: any) {
+    console.error('Error in POST /api/goals:', error?.message || error);
+    res.status(500).json({ error: 'Failed to create goal' });
+  }
+});
+
+// GET /api/goals/:id — Get goal with resolved entry previews
+app.get('/api/goals/:id', requireAuth, async (req, res) => {
+  try {
+    const uid = req.user!.uid;
+    const goalId = req.params.id;
+    const goal = await getGoal(uid, goalId);
+
+    if (!goal) {
+      res.status(404).json({ error: 'Goal not found' });
+      return;
+    }
+
+    const entryPreviews = await resolveEntryPreviews(uid, goal.relatedSessionIds || []);
+
+    res.json({
+      ...goal,
+      entryPreviews,
+    });
+  } catch (error: any) {
+    console.error('Error in GET /api/goals/:id:', error?.message || error);
+    res.status(500).json({ error: 'Failed to retrieve goal details' });
+  }
+});
+
+// PATCH /api/goals/:id — Edit fields, toggle milestones, change status
+app.patch('/api/goals/:id', requireAuth, async (req, res) => {
+  try {
+    const uid = req.user!.uid;
+    const goalId = req.params.id;
+    const updates = req.body || {};
+
+    if (updates.title !== undefined) {
+      if (typeof updates.title !== 'string' || !updates.title.trim()) {
+        res.status(400).json({ error: 'Goal title cannot be empty' });
+        return;
+      }
+      if (updates.title.trim().length > 180) {
+        res.status(400).json({ error: 'Goal title must be under 180 characters' });
+        return;
+      }
+    }
+
+    if (updates.status !== undefined) {
+      const validStatuses: GoalStatus[] = ['active', 'completed', 'paused', 'abandoned'];
+      if (!validStatuses.includes(updates.status)) {
+        res.status(400).json({ error: 'Invalid goal status' });
+        return;
+      }
+    }
+
+    const updated = await updateGoal(uid, goalId, updates);
+    if (!updated) {
+      res.status(404).json({ error: 'Goal not found' });
+      return;
+    }
+
+    res.json(updated);
+  } catch (error: any) {
+    console.error('Error in PATCH /api/goals/:id:', error?.message || error);
+    res.status(500).json({ error: 'Failed to update goal' });
+  }
+});
+
+// DELETE /api/goals/:id — Delete goal (204 No Content)
+app.delete('/api/goals/:id', requireAuth, async (req, res) => {
+  try {
+    const uid = req.user!.uid;
+    const goalId = req.params.id;
+
+    const deleted = await deleteGoal(uid, goalId);
+    if (!deleted) {
+      res.status(404).json({ error: 'Goal not found' });
+      return;
+    }
+
+    res.status(204).send();
+  } catch (error: any) {
+    console.error('Error in DELETE /api/goals/:id:', error?.message || error);
+    res.status(500).json({ error: 'Failed to delete goal' });
+  }
+});
+
+// GET /api/goals/:id/suggestions — Grounded suggestions referencing specific journal entries
+app.get('/api/goals/:id/suggestions', requireAuth, async (req, res) => {
+  try {
+    const uid = req.user!.uid;
+    const goalId = req.params.id;
+    const goal = await getGoal(uid, goalId);
+
+    if (!goal) {
+      res.status(404).json({ error: 'Goal not found' });
+      return;
+    }
+
+    // Constraint from Section 4: Max 2, each required to reference a sourceSessionId.
+    // If no grounded entries exist, return empty list.
+    const entryPreviews = await resolveEntryPreviews(uid, goal.relatedSessionIds || []);
+
+    if (entryPreviews.length === 0) {
+      res.json({ suggestions: [], sourceSessionIds: [] });
+      return;
+    }
+
+    const suggestions: string[] = [];
+    const sourceSessionIds: string[] = [];
+
+    for (const preview of entryPreviews.slice(0, 2)) {
+      suggestions.push(`Reflected in "${preview.title}": take one small manageable step toward this.`);
+      sourceSessionIds.push(preview.id);
+    }
+
+    res.json({
+      suggestions,
+      sourceSessionIds,
+    });
+  } catch (error: any) {
+    console.error('Error in GET /api/goals/:id/suggestions:', error?.message || error);
+    res.status(500).json({ error: 'Failed to generate goal suggestions' });
+  }
 });
 
 // Global Error Handling Middleware (Never leaks stack traces)

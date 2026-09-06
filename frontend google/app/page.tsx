@@ -18,6 +18,7 @@ import {
   LogOut,
   Palette,
   Check,
+  Target,
 } from 'lucide-react';
 import {
   SidebarProvider,
@@ -37,6 +38,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Features } from './features';
 import { Overview } from './overview';
 import { Workbench } from './workbench';
+import { GoalsPage } from './goals-page';
 import { useJournal } from './use-journal';
 import {
   emptyDraft,
@@ -247,6 +249,14 @@ function JournalApp({ onExit }: { onExit: () => void }) {
             >
               <BookOpen size={18} />
               My journal
+            </button>
+            <button
+              className={'nav-item ' + (view === 'Goals' ? 'active' : '')}
+              aria-current={view === 'Goals' ? 'page' : undefined}
+              onClick={() => go('Goals')}
+            >
+              <Target size={18} />
+              Goals
             </button>
             {[
               {
@@ -563,6 +573,8 @@ function JournalApp({ onExit }: { onExit: () => void }) {
           <div className="page-content">
             {view === 'Overview' ? (
               <Overview entries={entries} navigate={go} motif={preferences.backgroundMotif} />
+            ) : view === 'Goals' ? (
+              <GoalsPage entries={entries} navigate={go} notify={toast} />
             ) : (
               <Features
                 view={view}

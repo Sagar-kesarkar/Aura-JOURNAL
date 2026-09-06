@@ -56,7 +56,7 @@ export function Overview({
         </span>
       </div>
       <section className="start-card">
-        <CardMotif motif={motif} size={46} />
+        <CardMotif motif={motif} size={58} />
         <div className="eyebrow">YOUR NEXT CHAPTER</div>
         <h2>What’s on your mind?</h2>
         <p>There’s no right place to start. Just begin where you are.</p>
@@ -93,7 +93,7 @@ export function Overview({
             key={e.id}
             onClick={() => navigate('entry:' + e.id)}
           >
-            <CardMotif motif={motif} size={38} />
+            <CardMotif motif={motif} size={56} />
             <div className="entry-meta">
               <span>
                 <BookOpen size={15} /> {formatEntryDate(e)}

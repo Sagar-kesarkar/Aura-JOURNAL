@@ -442,7 +442,7 @@ export function Workbench({
   return (
     <div className={'journal-layout ' + (focus ? 'is-focused ' : '') + (insights ? 'has-insights' : 'no-insights')}>
       <section className="journal-center">
-        <CardMotif motif={motif} size={38} />
+        <CardMotif motif={motif} size={54} />
         <div className="journal-heading">
           <div className="journal-kicker">
             <span>{entry ? formatEntryDate(entry) : 'A NEW CHAPTER'}</span>
