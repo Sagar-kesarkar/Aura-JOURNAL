@@ -23,6 +23,16 @@ export type Draft = {
   mode: string;
   followup: string;
 };
+export type ThemeId =
+  | 'sage'
+  | 'ocean'
+  | 'linen'
+  | 'lavender'
+  | 'terracotta'
+  | 'midnight';
+
+export type MotifId = 'none' | 'botanical' | 'vintage' | 'zen' | 'celestial';
+
 export type Preferences = {
   statuses: Record<string, string>;
   feedback: string;
@@ -31,7 +41,113 @@ export type Preferences = {
   reviewTime: string;
   windowDays: string;
   concept: string;
+  theme: ThemeId;
+  backgroundMotif: MotifId;
 };
+
+export const themeList: {
+  id: ThemeId;
+  name: string;
+  description: string;
+  primary: string;
+  bg: string;
+  border: string;
+  accent: string;
+}[] = [
+  {
+    id: 'sage',
+    name: 'Forest Sage',
+    description: 'Calming botanical greenery & mindful forest tones',
+    primary: '#2b563e',
+    bg: '#fbfcf9',
+    border: '#dbe5d2',
+    accent: '#476a34',
+  },
+  {
+    id: 'ocean',
+    name: 'Ocean Cyan & Sky',
+    description: 'Serene sky blue, marine azure, and refreshing cyan mist',
+    primary: '#18648f',
+    bg: '#f6fafc',
+    border: '#cde0ee',
+    accent: '#2389b8',
+  },
+  {
+    id: 'linen',
+    name: 'Warm Linen & Beige',
+    description: 'Cozy skin and parchment tones, warm sand, and antique paper',
+    primary: '#7a512e',
+    bg: '#faf7f2',
+    border: '#e4d8c8',
+    accent: '#95653b',
+  },
+  {
+    id: 'lavender',
+    name: 'Lavender Mist',
+    description: 'Meditative royal purple, lilac twilight, and soft amethyst',
+    primary: '#5d3f78',
+    bg: '#faf7fc',
+    border: '#e2d4eb',
+    accent: '#7b549e',
+  },
+  {
+    id: 'terracotta',
+    name: 'Sunset Terracotta',
+    description: 'Earthy baked clay, dusky rose, and warm afternoon light',
+    primary: '#8d4233',
+    bg: '#fdf9f7',
+    border: '#ebd7d1',
+    accent: '#a95341',
+  },
+  {
+    id: 'midnight',
+    name: 'Midnight Slate',
+    description: 'Deep starlight obsidian, starry contrast, and nocturnal focus',
+    primary: '#58a6ff',
+    bg: '#0f141a',
+    border: '#2a3543',
+    accent: '#79c0ff',
+  },
+];
+
+export const motifList: {
+  id: MotifId;
+  name: string;
+  description: string;
+  icon: string;
+}[] = [
+  {
+    id: 'none',
+    name: 'Minimalist Clean',
+    description: 'Pure distraction-free canvas with zero background artwork',
+    icon: '✨',
+  },
+  {
+    id: 'botanical',
+    name: 'Botanical Florals',
+    description: 'Hand-drawn wildflowers, blossom petals, and leafy corner branches',
+    icon: '🌸',
+  },
+  {
+    id: 'vintage',
+    name: 'Vintage Filigree',
+    description: 'Antique Victorian corner scrollwork and ornate bookplate flourishes',
+    icon: '📜',
+  },
+  {
+    id: 'zen',
+    name: 'Zen Waves & Lotus',
+    description: 'Flowing concentric ripples and calming lotus petal geometry',
+    icon: '🪷',
+  },
+  {
+    id: 'celestial',
+    name: 'Celestial Cosmos',
+    description: 'Sparkling constellation dots, crescent moon, and distant stars',
+    icon: '🌙',
+  },
+];
+
 export const defaultPreferences: Preferences = {
   statuses: {},
   feedback: '',
@@ -40,6 +156,8 @@ export const defaultPreferences: Preferences = {
   reviewTime: '18:00',
   windowDays: '30',
   concept: 'Modern Notebook',
+  theme: 'sage',
+  backgroundMotif: 'none',
 };
 export const modes = [
   'Philosophical Reflection',

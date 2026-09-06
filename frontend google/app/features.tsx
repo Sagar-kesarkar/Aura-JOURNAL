@@ -14,6 +14,7 @@ import {
   Search,
   Sparkles,
   Trash2,
+  Palette,
 } from 'lucide-react';
 import {
   Dialog,
@@ -41,6 +42,10 @@ import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   type Entry,
   type Preferences,
+  type ThemeId,
+  type MotifId,
+  themeList,
+  motifList,
   modes,
   formatEntryDate,
 } from './journal-data';
@@ -72,11 +77,21 @@ export function Features({
   const [filter, setFilter] = useState('All modes');
   const [confirm, setConfirm] = useState<string | null>(null);
   const [thread, setThread] = useState<string | null>(null);
-  const { statuses, feedback, weekly, cadence, concept } = preferences;
+  const { statuses, feedback, weekly, cadence, concept, theme, backgroundMotif } = preferences;
   const setFeedback = (feedback: string) => patchPreferences({ feedback });
   const setWeekly = (weekly: boolean) => patchPreferences({ weekly });
   const setCadence = (cadence: string) => patchPreferences({ cadence });
   const setConcept = (concept: string) => patchPreferences({ concept });
+  const activeTheme: ThemeId = theme || 'sage';
+  const activeMotif: MotifId = backgroundMotif || 'none';
+  const setTheme = (t: ThemeId) => {
+    patchPreferences({ theme: t });
+    notify(`Atmosphere set to ${themeList.find((item) => item.id === t)?.name || t}.`);
+  };
+  const setMotif = (m: MotifId) => {
+    patchPreferences({ backgroundMotif: m });
+    notify(`Corner artwork set to ${motifList.find((item) => item.id === m)?.name || m}.`);
+  };
   function deleteConfirmed() {
     if (confirm === 'all') {
       if (update([])) {
@@ -450,6 +465,81 @@ export function Features({
         <>
           <div className="eyebrow">MAKE THIS SPACE YOURS</div>
           <h1>Settings & privacy.</h1>
+
+          <section className="settings-card">
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
+              <Palette size={20} className="text-primary" />
+              <h2 style={{ margin: 0 }}>Color Theme & Atmosphere</h2>
+            </div>
+            <p>
+              Personalize the palette and mood of your workspace. Choose between calming forest greens, ocean cyans, warm parchment beige, twilight lavender, or midnight focus.
+            </p>
+            <div className="theme-grid">
+              {themeList.map((t) => (
+                <button
+                  key={t.id}
+                  type="button"
+                  className={`theme-card ${activeTheme === t.id ? 'active' : ''}`}
+                  onClick={() => setTheme(t.id)}
+                  aria-pressed={activeTheme === t.id}
+                >
+                  <div className="theme-swatch-bar" style={{ background: t.bg, borderColor: t.border }}>
+                    <span className="theme-swatch-dot" style={{ background: t.primary }} />
+                    <span className="theme-swatch-dot" style={{ background: t.accent }} />
+                    <span className="theme-swatch-dot" style={{ background: t.border }} />
+                  </div>
+                  <div className="theme-card-body">
+                    <div className="theme-card-header">
+                      <strong>{t.name}</strong>
+                      {activeTheme === t.id && (
+                        <span className="theme-active-pill">
+                          <Check size={11} /> Active
+                        </span>
+                      )}
+                    </div>
+                    <p>{t.description}</p>
+                  </div>
+                </button>
+              ))}
+            </div>
+          </section>
+
+          <section className="settings-card">
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
+              <Sparkles size={20} className="text-primary" />
+              <h2 style={{ margin: 0 }}>Artistic Corner Artwork & Florals</h2>
+            </div>
+            <p>
+              Embellish the corners of your journal background with delicate botanical wildflowers, vintage Victorian filigree, or celestial stars.
+            </p>
+            <div className="motif-grid">
+              {motifList.map((m) => (
+                <button
+                  key={m.id}
+                  type="button"
+                  className={`motif-card ${activeMotif === m.id ? 'active' : ''}`}
+                  onClick={() => setMotif(m.id)}
+                  aria-pressed={activeMotif === m.id}
+                >
+                  <div className="motif-icon-wrap">
+                    <span className="motif-emoji">{m.icon}</span>
+                  </div>
+                  <div className="motif-card-body">
+                    <div className="motif-card-header">
+                      <strong>{m.name}</strong>
+                      {activeMotif === m.id && (
+                        <span className="theme-active-pill">
+                          <Check size={11} /> Selected
+                        </span>
+                      )}
+                    </div>
+                    <p>{m.description}</p>
+                  </div>
+                </button>
+              ))}
+            </div>
+          </section>
+
           <section className="settings-card">
             <h2>Your data, your choice.</h2>
             <p>

@@ -15,6 +15,8 @@ import {
   PanelLeft,
   Menu,
   LogOut,
+  Palette,
+  Check,
 } from 'lucide-react';
 import {
   SidebarProvider,
@@ -35,7 +37,14 @@ import { Features } from './features';
 import { Overview } from './overview';
 import { Workbench } from './workbench';
 import { useJournal } from './use-journal';
-import { emptyDraft, formatEntryDate, viewToHash } from './journal-data';
+import {
+  emptyDraft,
+  formatEntryDate,
+  viewToHash,
+  themeList,
+  motifList,
+} from './journal-data';
+import { BackgroundMotif } from '@/components/background-motif';
 import { WelcomePage } from './welcome-page';
 import { AuthProvider, useAuth } from '../lib/auth-context';
 
@@ -393,56 +402,104 @@ function JournalApp({ onExit }: { onExit: () => void }) {
               {editor ? 'Journal' : view === 'Overview' ? 'Overview' : view}
             </strong>
           </div>
-          <div className="topbar-profile-container">
-            {user ? (
-              <DropdownMenu>
-                <DropdownMenuTrigger className="topbar-user-badge" aria-label="Account details">
-                  <div className="topbar-avatar-wrap">
-                    {user.photoURL ? (
-                      <img
-                        src={user.photoURL}
-                        alt={user.displayName || 'User'}
-                        className="topbar-avatar-img"
-                      />
-                    ) : (
-                      <span className="topbar-avatar-fallback">
-                        {(user.displayName || user.email || 'S')[0].toUpperCase()}
-                      </span>
+          <div className="topbar-actions-wrap">
+            <DropdownMenu>
+              <DropdownMenuTrigger
+                className="topbar-theme-trigger"
+                aria-label="Customize theme & background artwork"
+                title="Theme & Atmosphere"
+              >
+                <Palette size={15} />
+                <span className="topbar-theme-label">Atmosphere</span>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="theme-quick-menu">
+                <div className="theme-menu-section-title">Color Palette</div>
+                {themeList.map((t) => (
+                  <DropdownMenuItem
+                    key={t.id}
+                    onClick={() => journal.patchPreferences({ theme: t.id })}
+                    className="theme-menu-item"
+                  >
+                    <span
+                      className="theme-menu-swatch"
+                      style={{ background: t.primary, borderColor: t.border }}
+                    />
+                    <span className="theme-menu-name">{t.name}</span>
+                    {preferences.theme === t.id && (
+                      <Check size={14} className="theme-menu-check ml-auto" />
                     )}
-                    <span className="topbar-avatar-dot" />
-                  </div>
-                  <div className="topbar-user-text">
-                    <span className="topbar-user-name">
-                      {user.displayName || 'Sagar Kesarkar'}
-                    </span>
-                    <span className="topbar-user-status">Cloud Synced</span>
-                  </div>
-                  <ChevronDown size={13} className="topbar-chevron" />
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="entry-menu">
-                  <DropdownMenuItem onClick={() => go('Settings')}>
-                    <Settings size={14} className="mr-2 inline" /> Settings & privacy
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => onExit()}>
-                    <LogOut size={14} className="mr-2 inline" /> Sign out
+                ))}
+                <div className="theme-menu-divider" />
+                <div className="theme-menu-section-title">Corner Artwork</div>
+                {motifList.map((m) => (
+                  <DropdownMenuItem
+                    key={m.id}
+                    onClick={() => journal.patchPreferences({ backgroundMotif: m.id })}
+                    className="theme-menu-item"
+                  >
+                    <span className="theme-menu-icon">{m.icon}</span>
+                    <span className="theme-menu-name">{m.name}</span>
+                    {preferences.backgroundMotif === m.id && (
+                      <Check size={14} className="theme-menu-check ml-auto" />
+                    )}
                   </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            ) : (
-              <div className="topbar-guest-wrap">
-                <button
-                  className="topbar-guest-btn"
-                  onClick={() => onExit()}
-                  title="Sign in with Google to sync notes"
-                >
-                  <span className="guest-dot" />
-                  <span>Guest Mode</span>
-                  <span className="topbar-signin-chip">Sign in</span>
-                </button>
-              </div>
-            )}
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            <div className="topbar-profile-container">
+              {user ? (
+                <DropdownMenu>
+                  <DropdownMenuTrigger className="topbar-user-badge" aria-label="Account details">
+                    <div className="topbar-avatar-wrap">
+                      {user.photoURL ? (
+                        <img
+                          src={user.photoURL}
+                          alt={user.displayName || 'User'}
+                          className="topbar-avatar-img"
+                        />
+                      ) : (
+                        <span className="topbar-avatar-fallback">
+                          {(user.displayName || user.email || 'S')[0].toUpperCase()}
+                        </span>
+                      )}
+                      <span className="topbar-avatar-dot" />
+                    </div>
+                    <div className="topbar-user-text">
+                      <span className="topbar-user-name">
+                        {user.displayName || 'Sagar Kesarkar'}
+                      </span>
+                      <span className="topbar-user-status">Cloud Synced</span>
+                    </div>
+                    <ChevronDown size={13} className="topbar-chevron" />
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="entry-menu">
+                    <DropdownMenuItem onClick={() => go('Settings')}>
+                      <Settings size={14} className="mr-2 inline" /> Settings & privacy
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => onExit()}>
+                      <LogOut size={14} className="mr-2 inline" /> Sign out
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              ) : (
+                <div className="topbar-guest-wrap">
+                  <button
+                    className="topbar-guest-btn"
+                    onClick={() => onExit()}
+                    title="Sign in with Google to sync notes"
+                  >
+                    <span className="guest-dot" />
+                    <span>Guest Mode</span>
+                    <span className="topbar-signin-chip">Sign in</span>
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         </header>
+        <BackgroundMotif motif={preferences.backgroundMotif} />
         {!journal.online && (
           <output className="global-notice">
             You’re offline. Writing and device-local saves remain available.

@@ -19,16 +19,107 @@
   --color-accent-foreground: var(--foreground);
   --radius-lg: 12px;
 }
-:root {
+:root,
+[data-theme='sage'] {
   --background: #fafbf9;
   --foreground: #293d37;
   --primary: #285c49;
-  --card: #fff;
+  --primary-hover: #1e4537;
+  --card: #ffffff;
   --muted: #eef2ed;
   --muted-foreground: #6c7770;
   --border: #e1e6df;
   --sidebar: #f0f3ed;
+  --accent: #476a34;
+  --accent-light: #edf3e7;
   --font-sans: Arial, Helvetica, sans-serif;
+  --motif-color: #3b5c46;
+  --motif-opacity: 0.22;
+}
+
+[data-theme='ocean'] {
+  --background: #f6fafc;
+  --foreground: #1c3240;
+  --primary: #18648f;
+  --primary-hover: #124d6e;
+  --card: #ffffff;
+  --muted: #eaf2f8;
+  --muted-foreground: #60798a;
+  --border: #d0e1ee;
+  --sidebar: #ebf3f7;
+  --accent: #2389b8;
+  --accent-light: #e6f3fa;
+  --font-sans: Arial, Helvetica, sans-serif;
+  --motif-color: #1f7fa8;
+  --motif-opacity: 0.25;
+}
+
+[data-theme='linen'] {
+  --background: #faf7f2;
+  --foreground: #3c2f25;
+  --primary: #7a512e;
+  --primary-hover: #613f23;
+  --card: #ffffff;
+  --muted: #f2ece2;
+  --muted-foreground: #7e7065;
+  --border: #e6dbcb;
+  --sidebar: #f2ece2;
+  --accent: #95653b;
+  --accent-light: #f7f1e8;
+  --font-sans: Arial, Helvetica, sans-serif;
+  --motif-color: #8c5d35;
+  --motif-opacity: 0.22;
+}
+
+[data-theme='lavender'] {
+  --background: #faf7fc;
+  --foreground: #332342;
+  --primary: #5d3f78;
+  --primary-hover: #48305e;
+  --card: #ffffff;
+  --muted: #f1e9f7;
+  --muted-foreground: #766584;
+  --border: #e3d5ec;
+  --sidebar: #f0e8f6;
+  --accent: #7b549e;
+  --accent-light: #f4ecf9;
+  --font-sans: Arial, Helvetica, sans-serif;
+  --motif-color: #6f4c8f;
+  --motif-opacity: 0.23;
+}
+
+[data-theme='terracotta'] {
+  --background: #fdf9f7;
+  --foreground: #3e2621;
+  --primary: #8d4233;
+  --primary-hover: #723326;
+  --card: #ffffff;
+  --muted: #f8ebe7;
+  --muted-foreground: #846862;
+  --border: #ebd8d2;
+  --sidebar: #f7edea;
+  --accent: #a95341;
+  --accent-light: #faece8;
+  --font-sans: Arial, Helvetica, sans-serif;
+  --motif-color: #a04e3e;
+  --motif-opacity: 0.22;
+}
+
+[data-theme='midnight'] {
+  --background: #0d1217;
+  --foreground: #e6edf3;
+  --primary: #58a6ff;
+  --primary-hover: #79c0ff;
+  --card: #161c24;
+  --muted: #1c242f;
+  --muted-foreground: #8b949e;
+  --border: #283340;
+  --sidebar: #121820;
+  --accent: #58a6ff;
+  --accent-light: #1a2736;
+  --font-sans: Arial, Helvetica, sans-serif;
+  --motif-color: #58a6ff;
+  --motif-opacity: 0.18;
 }
 * {
   box-sizing: border-box;
@@ -3066,3 +3157,326 @@ h1 em {
     font-size: 12px;
   }
 }
+
+/* ==========================================================================
+   DYNAMIC THEME APPLIED STYLES & ATMOSPHERE
+   ========================================================================== */
+.renewed-workspace {
+  background: var(--background) !important;
+  color: var(--foreground) !important;
+  transition: background 0.3s ease, color 0.3s ease;
+}
+.renewed-workspace .topbar {
+  background: var(--background) !important;
+  border-bottom: 1px solid var(--border) !important;
+  color: var(--foreground) !important;
+}
+.journal-center {
+  background: var(--background) !important;
+}
+.settings-card {
+  background: var(--card) !important;
+  border: 1px solid var(--border) !important;
+  transition: all 0.25s ease;
+}
+.settings-card h2 {
+  color: var(--foreground) !important;
+}
+
+/* Primary buttons & active elements */
+.journal-tab-pill[data-active],
+.journal-tab-pill[data-state='active'] {
+  background: var(--primary) !important;
+  border-color: var(--primary-hover) !important;
+  color: #ffffff !important;
+}
+.journal-tabs-list {
+  background: var(--muted) !important;
+  border-color: var(--border) !important;
+}
+.journal-tab-pill:hover {
+  background: var(--muted) !important;
+  color: var(--foreground) !important;
+}
+.reflect-button {
+  background: var(--primary) !important;
+  color: #ffffff !important;
+}
+.reflect-button:hover:not(:disabled) {
+  background: var(--primary-hover) !important;
+}
+.insights-toggle.active {
+  background: var(--primary) !important;
+  border-color: var(--primary) !important;
+  color: #ffffff !important;
+}
+.insights-toggle:hover {
+  background: var(--muted) !important;
+}
+.insights-heading h2 {
+  color: var(--foreground) !important;
+}
+.journal-title-row input {
+  color: var(--foreground) !important;
+}
+.journal-insights {
+  background: var(--sidebar) !important;
+  border-left: 1px solid var(--border) !important;
+}
+.aura-reflection {
+  background: var(--accent-light) !important;
+  border: 1px solid var(--border) !important;
+}
+.aura-reflection .message-label {
+  color: var(--primary) !important;
+}
+.aura-spark {
+  background: var(--muted) !important;
+  color: var(--primary) !important;
+}
+
+/* ==========================================================================
+   ARTISTIC BACKGROUND MOTIFS (CORNERS & BORDERS)
+   ========================================================================== */
+.journal-motif-container {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 0;
+  color: var(--motif-color, var(--primary));
+  opacity: var(--motif-opacity, 0.22);
+  transition: opacity 0.4s ease, color 0.4s ease;
+}
+.motif-art {
+  position: absolute;
+  pointer-events: none;
+}
+.motif-top-left {
+  top: 8px;
+  left: 8px;
+  width: 170px;
+  height: 170px;
+}
+.motif-top-right {
+  top: 8px;
+  right: 8px;
+  width: 170px;
+  height: 170px;
+}
+.motif-bottom-right {
+  bottom: 8px;
+  right: 8px;
+  width: 200px;
+  height: 200px;
+}
+.motif-bottom-left {
+  bottom: 8px;
+  left: 8px;
+  width: 150px;
+  height: 150px;
+}
+
+/* Ensure workspace content sits beautifully above motif art */
+.page-content,
+.journal-layout,
+.journal-center,
+.journal-composer {
+  position: relative;
+  z-index: 1;
+}
+
+/* ==========================================================================
+   TOPBAR THEME ACTIONS & QUICK SWITCHER
+   ========================================================================== */
+.topbar-actions-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-left: auto;
+}
+.topbar-theme-trigger {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 11px;
+  border-radius: 9999px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  color: var(--foreground);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+  transition: all 0.15s ease;
+}
+.topbar-theme-trigger:hover {
+  background: var(--muted);
+  border-color: var(--border);
+  color: var(--primary);
+}
+.topbar-theme-label {
+  display: inline;
+}
+@media (max-width: 640px) {
+  .topbar-theme-label {
+    display: none;
+  }
+}
+.theme-quick-menu {
+  min-width: 230px !important;
+  padding: 6px !important;
+  background: var(--card) !important;
+  border: 1px solid var(--border) !important;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1) !important;
+  border-radius: 12px !important;
+}
+.theme-menu-section-title {
+  padding: 6px 10px 4px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.8px;
+  color: var(--muted-foreground);
+  text-transform: uppercase;
+}
+.theme-menu-item {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  padding: 8px 10px !important;
+  border-radius: 8px !important;
+  font-size: 12px !important;
+  cursor: pointer !important;
+  color: var(--foreground) !important;
+  transition: all 0.15s ease !important;
+}
+.theme-menu-item:hover {
+  background: var(--muted) !important;
+}
+.theme-menu-swatch {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 1px solid transparent;
+  flex-shrink: 0;
+}
+.theme-menu-name {
+  font-weight: 500;
+  flex: 1;
+}
+.theme-menu-icon {
+  font-size: 14px;
+  width: 18px;
+  text-align: center;
+}
+.theme-menu-check {
+  color: var(--primary);
+  flex-shrink: 0;
+}
+.theme-menu-divider {
+  height: 1px;
+  background: var(--border);
+  margin: 6px 0;
+}
+
+/* ==========================================================================
+   SETTINGS THEME & MOTIF CARDS
+   ========================================================================== */
+.theme-grid,
+.motif-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 12px;
+  margin-top: 16px;
+}
+.theme-card,
+.motif-card {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+  padding: 12px;
+  border-radius: 10px;
+  background: var(--background);
+  border: 1.5px solid var(--border);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+.theme-card:hover,
+.motif-card:hover {
+  border-color: var(--primary);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+.theme-card.active,
+.motif-card.active {
+  border-color: var(--primary);
+  background: var(--accent-light);
+  box-shadow: 0 0 0 1px var(--primary);
+}
+.theme-swatch-bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 28px;
+  padding: 0 10px;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  margin-bottom: 10px;
+}
+.theme-swatch-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+.theme-card-body,
+.motif-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.theme-card-header,
+.motif-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
+.theme-card-header strong,
+.motif-card-header strong {
+  font-size: 13px;
+  color: var(--foreground);
+}
+.theme-card-body p,
+.motif-card-body p {
+  font-size: 11px;
+  color: var(--muted-foreground);
+  line-height: 1.4;
+  margin: 0;
+}
+.theme-active-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--primary);
+  background: var(--muted);
+  padding: 2px 6px;
+  border-radius: 6px;
+}
+.motif-icon-wrap {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: var(--muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 8px;
+}
+.motif-emoji {
+  font-size: 16px;
+}
+

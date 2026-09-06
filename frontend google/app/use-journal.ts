@@ -65,8 +65,10 @@ export function useJournal(userId?: string) {
           'reviewTime',
           'windowDays',
           'concept',
+          'theme',
+          'backgroundMotif',
         ] as const)
-          if (typeof p[k] === 'string') next[k] = p[k];
+          if (typeof p[k] === 'string') (next as any)[k] = p[k];
         if (typeof p.weekly === 'boolean') next.weekly = p.weekly;
         if (
           p.statuses &&
@@ -80,6 +82,10 @@ export function useJournal(userId?: string) {
           ) as Record<string, string>;
         prefsRef.current = next;
         setPreferences(next);
+        if (typeof document !== 'undefined') {
+          document.documentElement.setAttribute('data-theme', next.theme || 'sage');
+          document.documentElement.setAttribute('data-motif', next.backgroundMotif || 'none');
+        }
       } catch {
         toast.error('Preferences were reset; journal entries were kept.');
       }
@@ -213,6 +219,10 @@ export function useJournal(userId?: string) {
       localStorage.setItem(preferenceKey, JSON.stringify(next));
       prefsRef.current = next;
       setPreferences(next);
+      if (typeof document !== 'undefined') {
+        if (next.theme) document.documentElement.setAttribute('data-theme', next.theme);
+        if (next.backgroundMotif) document.documentElement.setAttribute('data-motif', next.backgroundMotif);
+      }
       return true;
     } catch {
       toast.error('Could not save that preference. Please try again.');
