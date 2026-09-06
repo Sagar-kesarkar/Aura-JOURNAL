@@ -18,7 +18,7 @@
 ```bash
 # Verify the mandatory challenge label on your deployed Cloud Run service
 gcloud run services describe aura-journal \
-  --region=us-central1 \
+  --region=asia-southeast1 \
   --format="value(metadata.labels['dev-tutorial'])"
 # Expected output: cloud-run-ai-challenge
 ```
@@ -159,11 +159,11 @@ Build and deploy the containerized application to Google Cloud Run, injecting `G
 # 1. Deploy the service to Google Cloud Run
 gcloud run deploy aura-journal \
   --source . \
-  --region us-central1 \
+  --region asia-southeast1 \
   --platform managed \
   --allow-unauthenticated \
   --port 3000 \
-  --set-env-vars="GOOGLE_CLOUD_PROJECT=YOUR_PROJECT_ID,ALLOWED_ORIGINS=https://your-cloud-run-domain,GEMINI_MODEL=gemini-3.8-flash,NODE_ENV=production" \
+  --set-env-vars="GOOGLE_CLOUD_PROJECT=YOUR_PROJECT_ID,ALLOWED_ORIGINS=https://your-cloud-run-domain,GEMINI_MODEL=gemini-3.8-flash,GEMINI_FALLBACK_MODELS=gemini-3.6-flash,NODE_ENV=production" \
   --set-secrets="GEMINI_API_KEY=GEMINI_API_KEY:latest" \
   --labels="dev-tutorial=cloud-run-ai-challenge"
 ```
@@ -173,7 +173,7 @@ Or if you need to update an existing deployment with the mandatory challenge lab
 # 2. Apply / update mandatory challenge label
 gcloud run services update aura-journal \
   --update-labels=dev-tutorial=cloud-run-ai-challenge \
-  --region=us-central1
+  --region=asia-southeast1
 ```
 
 ---
