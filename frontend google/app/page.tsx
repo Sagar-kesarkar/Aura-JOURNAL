@@ -10,6 +10,7 @@ import {
   Feather,
   Search,
   LayoutDashboard,
+  ArrowUpRight,
   ChevronDown,
   PanelLeft,
   Menu,
