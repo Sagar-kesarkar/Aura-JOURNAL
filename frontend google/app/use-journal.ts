@@ -89,11 +89,12 @@ export function useJournal(userId?: string) {
       } catch {
         toast.error('Preferences were reset; journal entries were kept.');
       }
-      const initialView = window.location.hash
+      const parsedView = window.location.hash
         ? hashToView(window.location.hash)
         : 'Overview';
+      const initialView = parsedView === 'Welcome' ? 'Overview' : parsedView;
       setView(initialView);
-      if (!window.location.hash)
+      if (!window.location.hash || window.location.hash === '#welcome')
         window.history.replaceState(null, '', viewToHash(initialView));
     } catch {
       readable.current = false;
@@ -103,7 +104,15 @@ export function useJournal(userId?: string) {
     }
     setReady(true);
     setOnline(navigator.onLine);
-    const hash = () => setView(hashToView(window.location.hash));
+    const hash = () => {
+      const v = hashToView(window.location.hash);
+      if (v === 'Welcome') {
+        setView('Overview');
+        window.history.replaceState(null, '', viewToHash('Overview'));
+      } else {
+        setView(v);
+      }
+    };
     const on = () => setOnline(true);
     const off = () => setOnline(false);
     window.addEventListener('hashchange', hash);

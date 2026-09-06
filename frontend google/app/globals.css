@@ -127,7 +127,6 @@
   border-color: var(--border);
 }
 html {
-  zoom: 0.9; /* 90% view default as requested */
   height: 100%;
   min-height: 100%;
   background: var(--background);
@@ -1077,28 +1076,41 @@ h1 em {
   gap: 12px;
 }
 .history-list > button {
-  display: flex;
-  align-items: center;
-  gap: 20px;
-  text-align: left;
-  padding: 25px;
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  background: var(--card);
-  position: relative;
-  overflow: hidden;
-  transition: all 0.2s ease;
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 20px !important;
+  text-align: left !important;
+  padding: 22px 26px !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 10px !important;
+  background: var(--card) !important;
+  width: 100% !important;
+  position: relative !important;
+  overflow: hidden !important;
+  transition: all 0.2s ease !important;
+  cursor: pointer !important;
 }
 .history-list > button:hover {
-  border-color: var(--primary);
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px -4px rgba(0, 0, 0, 0.06);
+  border-color: var(--primary) !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 6px 20px -4px rgba(0, 0, 0, 0.06) !important;
+}
+.history-list > button > .thread-icon {
+  flex-shrink: 0 !important;
+  margin: 0 !important;
 }
 .history-list > button > div {
-  flex: 1;
-  min-width: 0;
-  position: relative;
-  z-index: 1;
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+  margin: 0 !important;
+  text-align: left !important;
+}
+.history-list > button > svg:last-child {
+  flex-shrink: 0 !important;
+  margin-left: auto !important;
+  color: var(--primary) !important;
 }
 .history-list h3 {
   font:
@@ -3486,7 +3498,6 @@ h1 em {
 /* Ensure card containers establish a relative bounding box so corner graphics never spill into the window/corners */
 .start-card,
 .entry-card,
-.history-list > button,
 .journal-center {
   position: relative !important;
   overflow: hidden !important;
@@ -3495,7 +3506,6 @@ h1 em {
 /* Ensure inner interactive content stays above corner artwork */
 .start-card > *:not(.card-motif-overlay):not(.card-quote),
 .entry-card > *:not(.card-motif-overlay),
-.history-list > button > *:not(.card-motif-overlay),
 .journal-center > *:not(.card-motif-overlay) {
   position: relative;
   z-index: 1;

@@ -1,6 +1,6 @@
 'use client';
 /* oxlint-disable react/react-compiler -- Synchronizes route-selected drafts and MediaRecorder lifecycle; experimental compiler lint also reports an internal invariant on the recording closure. */
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   ArrowLeft,
   ArrowRight,
@@ -78,6 +78,12 @@ export function Features({
   const [filter, setFilter] = useState('All modes');
   const [confirm, setConfirm] = useState<string | null>(null);
   const [thread, setThread] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (view === 'Welcome') {
+      navigate('Overview');
+    }
+  }, [view, navigate]);
   const { statuses, feedback, weekly, cadence, concept, theme, backgroundMotif } = preferences;
   const setFeedback = (feedback: string) => patchPreferences({ feedback });
   const setWeekly = (weekly: boolean) => patchPreferences({ weekly });
@@ -226,8 +232,7 @@ export function Features({
                   (filter === 'All modes' || e.mode === filter),
               )
               .map((e) => (
-                <button key={e.id} onClick={() => navigate('entry:' + e.id)} className="relative overflow-hidden">
-                  <CardMotif motif={backgroundMotif} size={26} />
+                <button key={e.id} onClick={() => navigate('entry:' + e.id)}>
                   <span className="thread-icon">
                     <BookOpen size={20} />
                   </span>

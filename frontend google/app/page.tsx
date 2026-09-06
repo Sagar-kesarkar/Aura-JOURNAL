@@ -90,6 +90,12 @@ function MainAppShell() {
     setDemoEntered(false);
   };
 
+  useEffect(() => {
+    if (user && (window.location.hash === '#welcome' || window.location.hash === viewToHash('Welcome') || !window.location.hash)) {
+      window.history.replaceState(null, '', viewToHash('Overview'));
+    }
+  }, [user]);
+
   const isEntered = Boolean(user) || demoEntered;
 
   if (!isEntered)
@@ -186,6 +192,12 @@ function JournalApp({ onExit }: { onExit: () => void }) {
       document.documentElement.setAttribute('data-motif', preferences.backgroundMotif || 'none');
     }
   }, [preferences.theme, preferences.backgroundMotif]);
+
+  useEffect(() => {
+    if (view === 'Welcome') {
+      go('Overview');
+    }
+  }, [view, go]);
 
   return (
     <>
@@ -345,13 +357,6 @@ function JournalApp({ onExit }: { onExit: () => void }) {
           </div>
         </SidebarContent>
         <SidebarFooter>
-          <button
-            className={'nav-item ' + (view === 'Settings' ? 'active' : '')}
-            onClick={() => go('Settings')}
-          >
-            <Settings size={18} />
-            Settings & privacy
-          </button>
           <DropdownMenu>
             <DropdownMenuTrigger className="profile profile-button" aria-label="User profile settings">
               <div className="profile-avatar-wrap">
@@ -380,7 +385,7 @@ function JournalApp({ onExit }: { onExit: () => void }) {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start" className="entry-menu">
               <DropdownMenuItem onClick={() => go('Settings')}>
-                <Settings size={14} className="mr-2 inline" /> Privacy & data controls
+                <Settings size={14} className="mr-2 inline" /> Settings & privacy
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => onExit()}>
                 <LogOut size={14} className="mr-2 inline" /> {user ? 'Sign out' : 'Leave demo / sign in'}
