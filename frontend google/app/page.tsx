@@ -383,6 +383,8 @@ function JournalApp({ onExit }: { onExit: () => void }) {
       <main
         id="main-content"
         tabIndex={-1}
+        data-theme={preferences.theme || 'sage'}
+        data-motif={preferences.backgroundMotif || 'none'}
         className={
           'workspace renewed-workspace ' + (focus ? 'workspace-focused' : '')
         }
@@ -499,7 +501,6 @@ function JournalApp({ onExit }: { onExit: () => void }) {
             </div>
           </div>
         </header>
-        <BackgroundMotif motif={preferences.backgroundMotif} />
         {!journal.online && (
           <output className="global-notice">
             You’re offline. Writing and device-local saves remain available.
@@ -541,11 +542,12 @@ function JournalApp({ onExit }: { onExit: () => void }) {
             focus={focus}
             setFocus={setFocus}
             threadStatus={preferences.statuses}
+            motif={preferences.backgroundMotif}
           />
         ) : (
           <div className="page-content">
             {view === 'Overview' ? (
-              <Overview entries={entries} navigate={go} />
+              <Overview entries={entries} navigate={go} motif={preferences.backgroundMotif} />
             ) : (
               <Features
                 view={view}

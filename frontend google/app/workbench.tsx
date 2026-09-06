@@ -60,7 +60,9 @@ import {
   type Draft,
   type Entry,
   type JournalMessage,
+  type MotifId,
 } from './journal-data';
+import { CardMotif } from '@/components/background-motif';
 import { toast } from 'sonner';
 import { useAuth } from '../lib/auth-context';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -81,6 +83,7 @@ export function Workbench({
   initialVoice = false,
   saveDraft,
   deleteEntry,
+  motif,
 }: {
   entry?: Entry;
   draft: Draft;
@@ -95,6 +98,7 @@ export function Workbench({
   initialVoice?: boolean;
   saveDraft: (id: string, d: Draft) => void;
   deleteEntry?: (id: string) => Promise<boolean>;
+  motif?: MotifId;
 }) {
   const { user } = useAuth();
   const isMobile = useIsMobile();
@@ -438,6 +442,7 @@ export function Workbench({
   return (
     <div className={'journal-layout ' + (focus ? 'is-focused ' : '') + (insights ? 'has-insights' : 'no-insights')}>
       <section className="journal-center">
+        <CardMotif motif={motif} size={38} />
         <div className="journal-heading">
           <div className="journal-kicker">
             <Feather size={16} />

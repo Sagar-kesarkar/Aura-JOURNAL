@@ -12,13 +12,17 @@ import {
   Sparkles,
   CalendarDays,
 } from 'lucide-react';
-import { type Entry, formatEntryDate, readingMinutes } from './journal-data';
+import { type Entry, type MotifId, formatEntryDate, readingMinutes } from './journal-data';
+import { CardMotif } from '@/components/background-motif';
+
 export function Overview({
   entries,
   navigate,
+  motif,
 }: {
   entries: Entry[];
   navigate: (v: string) => void;
+  motif?: MotifId;
 }) {
   const now = new Date();
   return (
@@ -50,6 +54,7 @@ export function Overview({
         </span>
       </div>
       <section className="start-card">
+        <CardMotif motif={motif} size={46} />
         <div className="eyebrow">YOUR NEXT CHAPTER</div>
         <h2>What’s on your mind?</h2>
         <p>There’s no right place to start. Just begin where you are.</p>
@@ -86,6 +91,7 @@ export function Overview({
             key={e.id}
             onClick={() => navigate('entry:' + e.id)}
           >
+            <CardMotif motif={motif} size={28} />
             <div className="entry-meta">
               <span>
                 <BookOpen size={15} /> {formatEntryDate(e)}

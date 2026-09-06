@@ -39,6 +39,7 @@ import {
 } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { CardMotif } from '@/components/background-motif';
 import {
   type Entry,
   type Preferences,
@@ -225,7 +226,8 @@ export function Features({
                   (filter === 'All modes' || e.mode === filter),
               )
               .map((e) => (
-                <button key={e.id} onClick={() => navigate('entry:' + e.id)}>
+                <button key={e.id} onClick={() => navigate('entry:' + e.id)} className="relative overflow-hidden">
+                  <CardMotif motif={backgroundMotif} size={26} />
                   <span className="thread-icon">
                     <BookOpen size={20} />
                   </span>
