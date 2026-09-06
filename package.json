@@ -11,6 +11,7 @@
     "start": "node start-prod.mjs",
     "test": "node node_modules/tsx/dist/cli.mjs --test tests/backend-auth.test.ts tests/firestore-rules-static.test.ts",
     "test:rules:static": "node node_modules/tsx/dist/cli.mjs --test tests/firestore-rules-static.test.ts",
+    "test:rules:emulator": "firebase emulators:exec --project aura-journal-emulator-test --only firestore \"node node_modules/tsx/dist/cli.mjs --test tests/firestore-rules-emulator.test.ts\"",
     "test:auth": "node node_modules/tsx/dist/cli.mjs --test tests/backend-auth.test.ts",
     "test:frontend": "node --experimental-strip-types --test \"frontend google/tests/journal-data.test.mjs\""
   },

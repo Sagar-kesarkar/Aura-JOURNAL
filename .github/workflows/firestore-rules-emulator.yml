@@ -34,5 +34,9 @@ jobs:
       - name: Install Firebase CLI Globally
         run: npm install -g firebase-tools
 
+      - name: Pre-cache Firestore Emulator
+        run: firebase setup:emulators:firestore
+
       - name: Run Real Firestore Emulator Suite
         run: npm run test:rules:emulator
+

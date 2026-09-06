@@ -23,13 +23,17 @@ describe('Firestore Security Rules Genuine Emulator Suite (@firebase/rules-unit-
       );
     }
 
-    const hostParts = process.env.FIRESTORE_EMULATOR_HOST.split(':');
+    const rawHost = (process.env.FIRESTORE_EMULATOR_HOST || '127.0.0.1:8080').replace(/^https?:\/\//, '');
+    const lastColonIndex = rawHost.lastIndexOf(':');
+    const host = lastColonIndex !== -1 ? rawHost.substring(0, lastColonIndex) : '127.0.0.1';
+    const port = lastColonIndex !== -1 ? Number(rawHost.substring(lastColonIndex + 1)) : 8080;
+
     testEnv = await initializeTestEnvironment({
       projectId: PROJECT_ID,
       firestore: {
         rules: fs.readFileSync(path.resolve(process.cwd(), 'firestore.rules'), 'utf8'),
-        host: hostParts[0],
-        port: Number(hostParts[1]),
+        host,
+        port,
       },
     });
   });
