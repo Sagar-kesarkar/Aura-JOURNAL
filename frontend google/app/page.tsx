@@ -10,10 +10,10 @@ import {
   Feather,
   Search,
   LayoutDashboard,
-  ArrowUpRight,
   ChevronDown,
   PanelLeft,
   Menu,
+  LogOut,
 } from 'lucide-react';
 import {
   SidebarProvider,
@@ -44,6 +44,20 @@ export default function Home() {
       <MainAppShell />
     </AuthProvider>
   );
+}
+
+function formatDisplayEmail(email?: string | null) {
+  if (!email) return 'Device-local demo';
+  const atIndex = email.indexOf('@');
+  if (atIndex > 0) {
+    const userPart = email.slice(0, atIndex);
+    const domainPart = email.slice(atIndex);
+    if (userPart.length > 10) {
+      return `${userPart.slice(0, 10)}...${domainPart}`;
+    }
+    return email;
+  }
+  return email.length > 16 ? `${email.slice(0, 13)}...` : email;
 }
 
 function MainAppShell() {
@@ -320,30 +334,37 @@ function JournalApp({ onExit }: { onExit: () => void }) {
             Settings & privacy
           </button>
           <DropdownMenu>
-            <DropdownMenuTrigger className="profile profile-button">
-              {user?.photoURL ? (
-                <img
-                  src={user.photoURL}
-                  alt={user.displayName || 'User'}
-                  className="avatar rounded-full w-7 h-7 object-cover"
-                />
-              ) : (
-                <span className="avatar">
-                  {(user?.displayName || user?.email || 'Y')[0].toUpperCase()}
+            <DropdownMenuTrigger className="profile profile-button" aria-label="User profile settings">
+              <div className="profile-avatar-wrap">
+                {user?.photoURL ? (
+                  <img
+                    src={user.photoURL}
+                    alt={user.displayName || 'User'}
+                    className="profile-avatar-img"
+                  />
+                ) : (
+                  <span className="profile-avatar-fallback">
+                    {(user?.displayName || user?.email || 'S')[0].toUpperCase()}
+                  </span>
+                )}
+                {user && <span className="profile-status-indicator" />}
+              </div>
+              <div className="profile-info">
+                <span className="profile-name">
+                  {user?.displayName || (user ? 'Authenticated User' : 'Your workspace')}
                 </span>
-              )}
-              <span>
-                {user?.displayName || (user ? 'Authenticated User' : 'Your workspace')}
-                <small>{user?.email || 'Device-local demo'}</small>
-              </span>
-              <ChevronDown size={16} />
+                <span className="profile-email" title={user?.email || 'Device-local demo'}>
+                  {formatDisplayEmail(user?.email)}
+                </span>
+              </div>
+              <ChevronDown size={14} className="profile-chevron" />
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start" className="entry-menu">
               <DropdownMenuItem onClick={() => go('Settings')}>
-                Privacy & data controls
+                <Settings size={14} className="mr-2 inline" /> Privacy & data controls
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => onExit()}>
-                {user ? 'Sign out' : 'Leave demo / sign in'}
+                <LogOut size={14} className="mr-2 inline" /> {user ? 'Sign out' : 'Leave demo / sign in'}
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -371,15 +392,54 @@ function JournalApp({ onExit }: { onExit: () => void }) {
               {editor ? 'Journal' : view === 'Overview' ? 'Overview' : view}
             </strong>
           </div>
-          <div className="topbar-status">
-            <span className="status-dot" />
-            Frontend demo{' '}
-            <button
-              onClick={() => go('Settings')}
-              aria-label="View storage and connection details"
-            >
-              Local only <ChevronDown size={13} />
-            </button>
+          <div className="topbar-profile-container">
+            {user ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger className="topbar-user-badge" aria-label="Account details">
+                  <div className="topbar-avatar-wrap">
+                    {user.photoURL ? (
+                      <img
+                        src={user.photoURL}
+                        alt={user.displayName || 'User'}
+                        className="topbar-avatar-img"
+                      />
+                    ) : (
+                      <span className="topbar-avatar-fallback">
+                        {(user.displayName || user.email || 'S')[0].toUpperCase()}
+                      </span>
+                    )}
+                    <span className="topbar-avatar-dot" />
+                  </div>
+                  <div className="topbar-user-text">
+                    <span className="topbar-user-name">
+                      {user.displayName || 'Sagar Kesarkar'}
+                    </span>
+                    <span className="topbar-user-status">Cloud Synced</span>
+                  </div>
+                  <ChevronDown size={13} className="topbar-chevron" />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="entry-menu">
+                  <DropdownMenuItem onClick={() => go('Settings')}>
+                    <Settings size={14} className="mr-2 inline" /> Settings & privacy
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => onExit()}>
+                    <LogOut size={14} className="mr-2 inline" /> Sign out
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <div className="topbar-guest-wrap">
+                <button
+                  className="topbar-guest-btn"
+                  onClick={() => onExit()}
+                  title="Sign in with Google to sync notes"
+                >
+                  <span className="guest-dot" />
+                  <span>Guest Mode</span>
+                  <span className="topbar-signin-chip">Sign in</span>
+                </button>
+              </div>
+            )}
           </div>
         </header>
         {!journal.online && (

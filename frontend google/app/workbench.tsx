@@ -19,6 +19,8 @@ import {
   Trash2,
   Volume2,
   X,
+  PenLine,
+  MessageSquareQuote,
 } from 'lucide-react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import {
@@ -61,6 +63,7 @@ import {
 } from './journal-data';
 import { toast } from 'sonner';
 import { useAuth } from '../lib/auth-context';
+import { useIsMobile } from '@/hooks/use-mobile';
 import { reflectWithGemini } from '../lib/api';
 const sampleReflection =
   'You noticed something in that quiet walk: a little less input made room for your own thoughts. It sounds like you’re not looking to do more, but to leave a little space in what you already do.';
@@ -94,7 +97,8 @@ export function Workbench({
   deleteEntry?: (id: string) => Promise<boolean>;
 }) {
   const { user } = useAuth();
-  const [tab, setTab] = useState(entry ? 'conversation' : 'writing');
+  const isMobile = useIsMobile();
+  const [tab, setTab] = useState('writing');
   const [voice, setVoice] = useState(initialVoice);
   const [insights, setInsights] = useState(false);
   const [remove, setRemove] = useState(false);
@@ -317,24 +321,18 @@ export function Workbench({
   const insightContent = (
     <>
       <div className="insights-heading">
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
-          <span className="eyebrow">A LITTLE PERSPECTIVE</span>
+        <div className="insights-header">
+          <div className="insights-header-meta">
+            <span className="insights-eyebrow">A LITTLE PERSPECTIVE</span>
+            <span className="insights-pill">AI Assisted</span>
+          </div>
           <button
             onClick={() => setInsights(false)}
-            aria-label="Close insights"
+            aria-label="Close insights panel"
             title="Close insights"
-            style={{
-              background: 'none',
-              border: 'none',
-              color: '#7e8f6f',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              padding: '4px',
-              borderRadius: '4px',
-            }}
+            className="insights-close-button"
           >
-            <X size={16} />
+            <X size={15} />
           </button>
         </div>
         <h2>Between the lines</h2>
@@ -508,12 +506,34 @@ export function Workbench({
           className="journal-tabs"
         >
           <div className="journal-tabbar">
-            <TabsList variant="line" aria-label="Journal view">
-              <TabsTrigger value="conversation">Conversation</TabsTrigger>
-              <TabsTrigger value="writing">Writing</TabsTrigger>
+            <TabsList variant="line" className="journal-tabs-list" aria-label="Journal view">
+              <TabsTrigger value="writing" className="journal-tab-pill">
+                <PenLine size={13} />
+                <span>Write</span>
+              </TabsTrigger>
+              <TabsTrigger value="conversation" className="journal-tab-pill">
+                <MessageSquareQuote size={13} />
+                <span>Conversation</span>
+                {((entry?.messages?.length || 0) > 0) && (
+                  <span className="tab-count-badge">{entry?.messages?.length}</span>
+                )}
+              </TabsTrigger>
             </TabsList>
-            <span>{wordCount} words</span>
+            <span className="word-count-badge">{wordCount} words</span>
           </div>
+          <TabsContent value="writing" className="writing-content">
+            <textarea
+              aria-label="Your journal entry"
+              className="notebook-input"
+              value={draft.body}
+              onChange={(e) => patch({ body: e.target.value })}
+              placeholder="Let your thoughts land here. They don’t have to be perfect."
+              maxLength={30000}
+            />
+            <p className="writing-hint">
+              No perfect words needed. Just your own.
+            </p>
+          </TabsContent>
           <TabsContent value="conversation" className="conversation-content">
             <div className="conversation-date">
               <span />
@@ -651,19 +671,6 @@ export function Workbench({
               </article>
             )}
           </TabsContent>
-          <TabsContent value="writing" className="writing-content">
-            <textarea
-              aria-label="Your journal entry"
-              className="notebook-input"
-              value={draft.body}
-              onChange={(e) => patch({ body: e.target.value })}
-              placeholder="Let your thoughts land here. They don’t have to be perfect."
-              maxLength={30000}
-            />
-            <p className="writing-hint">
-              No perfect words needed. Just your own.
-            </p>
-          </TabsContent>
         </Tabs>
         <div className="journal-composer">
           {error && (
@@ -745,16 +752,20 @@ export function Workbench({
           onSave={() => save(tab === 'conversation' && !!draft.followup.trim())}
         />
       </section>
-      {insights && <aside className="journal-insights">{insightContent}</aside>}
-      <Sheet open={insights} onOpenChange={setInsights}>
-        <SheetContent className="insight-sheet">
-          <SheetTitle className="sr-only">Journal insights</SheetTitle>
-          <SheetDescription className="sr-only">
-            Sample insights, recurring threads, and weekly review.
-          </SheetDescription>
-          {insightContent}
-        </SheetContent>
-      </Sheet>
+      {!isMobile && insights && (
+        <aside className="journal-insights">{insightContent}</aside>
+      )}
+      {isMobile && (
+        <Sheet open={insights} onOpenChange={setInsights}>
+          <SheetContent className="insight-sheet" showCloseButton={false}>
+            <SheetTitle className="sr-only">Journal insights</SheetTitle>
+            <SheetDescription className="sr-only">
+              Sample insights, recurring threads, and weekly review.
+            </SheetDescription>
+            {insightContent}
+          </SheetContent>
+        </Sheet>
+      )}
       <VoiceDialog
         open={voice}
         close={() => setVoice(false)}

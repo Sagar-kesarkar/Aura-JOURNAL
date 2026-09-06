@@ -1629,20 +1629,100 @@ h1 em {
   line-height: 1.7;
 }
 .profile-button {
+  display: flex;
+  align-items: center;
+  gap: 10px;
   width: 100%;
+  max-width: 100%;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: transparent;
+  border: 1px solid transparent;
+  color: #3b553c;
+  transition: all 0.15s ease;
+  box-sizing: border-box;
+  overflow: hidden;
   text-align: left;
 }
-.profile-button > span:nth-child(2) {
-  font-size: 13px;
+.profile-button:hover {
+  background: #e7eedf;
+  border-color: #dce5d2;
 }
-.profile-button svg {
+.profile-avatar-wrap {
+  position: relative;
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+}
+.profile-avatar-img {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1.5px solid #bdd3a7;
+}
+.profile-avatar-fallback {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #d8e6c9;
+  color: #385d34;
+  font-weight: 600;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.profile-status-indicator {
+  position: absolute;
+  bottom: -1px;
+  right: -1px;
+  width: 9px;
+  height: 9px;
+  background: #469a49;
+  border: 2px solid #f0f3ed;
+  border-radius: 50%;
+}
+.profile-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+  overflow: hidden;
+}
+.profile-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: #27402c;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.3;
+}
+.profile-email {
+  font-size: 11px;
+  color: #728469;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.3;
+  margin-top: 1px;
+}
+.profile-chevron {
+  flex-shrink: 0;
   margin-left: auto;
+  color: #85987a;
+  transition: transform 0.2s ease;
 }
 .renewed-workspace .topbar {
   height: 68px;
   padding: 0 26px;
   font-size: 13px;
   background: #fbfcf9;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 .breadcrumb {
   display: flex;
@@ -1660,29 +1740,119 @@ h1 em {
 .breadcrumb-slash {
   color: #b4bdac;
 }
-.topbar-status {
+.topbar-profile-container {
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-size: 11px;
-  color: #74876b;
+  margin-left: auto;
 }
-.status-dot {
-  width: 5px;
-  height: 5px;
-  background: #8e9f80;
+.topbar-user-badge {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 4px 12px 4px 5px;
+  border-radius: 9999px;
+  background: #ffffff;
+  border: 1px solid #dbe4d2;
+  color: #2d4533;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+.topbar-user-badge:hover {
+  background: #f4f8ef;
+  border-color: #c7d8ba;
+}
+.topbar-avatar-wrap {
+  position: relative;
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+}
+.topbar-avatar-img,
+.topbar-avatar-fallback {
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
-}
-.topbar-status button {
+  object-fit: cover;
+  background: #dfead5;
+  color: #2d4c2b;
+  font-weight: 600;
+  font-size: 12px;
   display: flex;
   align-items: center;
-  gap: 5px;
-  border: 1px solid #dfe6d7;
-  border-radius: 5px;
-  padding: 5px 8px;
-  margin-left: 12px;
+  justify-content: center;
+}
+.topbar-avatar-dot {
+  position: absolute;
+  bottom: -1px;
+  right: -1px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #3fae49;
+  border: 1.5px solid #ffffff;
+}
+.topbar-user-text {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+  line-height: 1.2;
+}
+.topbar-user-name {
+  font-size: 12px;
+  font-weight: 600;
+  color: #29422f;
+  max-width: 140px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.topbar-user-status {
+  font-size: 10px;
+  color: #4b7a42;
+  font-weight: 500;
+}
+.topbar-chevron {
+  color: #8b9c80;
+  margin-left: 2px;
+  flex-shrink: 0;
+}
+.topbar-guest-wrap {
+  display: flex;
+  align-items: center;
+}
+.topbar-guest-btn {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 5px 10px 5px 12px;
+  border-radius: 9999px;
+  background: #f4f7f0;
+  border: 1px solid #dce5d4;
+  font-size: 12px;
+  color: #496342;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.topbar-guest-btn:hover {
+  background: #e9f0e2;
+  border-color: #ccd9c1;
+}
+.guest-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #96a78b;
+}
+.topbar-signin-chip {
+  background: #2e5942;
+  color: #ffffff;
+  padding: 2px 8px;
+  border-radius: 10px;
   font-size: 11px;
-  min-height: 32px;
+  font-weight: 500;
+  margin-left: 3px;
 }
 .journal-layout {
   display: grid;
@@ -1790,32 +1960,77 @@ h1 em {
   align-items: center;
   justify-content: space-between;
   margin: 0 38px;
-  border-bottom: 1px solid #e8ecdf;
-  padding-bottom: 6px;
-  gap: 10px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #e7ede0;
+  gap: 12px;
 }
-.journal-tabbar [data-slot='tabs-list'] {
-  height: 42px !important;
-  padding: 0;
-  gap: 26px;
+.journal-tabs-list {
+  display: inline-flex !important;
+  align-items: center;
+  gap: 6px;
+  background: #edf3e7 !important;
+  padding: 4px !important;
+  border-radius: 10px;
+  border: 1px solid #dbe5d2;
+  height: auto !important;
 }
-.journal-tabbar [data-slot='tabs-trigger'] {
-  font-size: 13px;
-  padding: 0;
-  min-height: 42px;
-  color: #839173;
-  flex: none;
+.journal-tab-pill {
+  display: inline-flex !important;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 14px !important;
+  min-height: 32px !important;
+  border-radius: 7px !important;
+  font-size: 12px !important;
+  font-weight: 500 !important;
+  color: #556c4d !important;
+  border: 1px solid transparent !important;
+  background: transparent !important;
+  transition: all 0.15s ease;
+  cursor: pointer;
 }
-.journal-tabbar [data-slot='tabs-trigger'][data-active] {
-  color: #395d3c;
-  font-weight: 500;
+.journal-tab-pill:hover {
+  background: #e1ebda !important;
+  color: #354e2f !important;
 }
-.journal-tabbar [data-slot='tabs-trigger']:after {
-  background: #557f49;
+.journal-tab-pill[data-active],
+.journal-tab-pill[data-state='active'] {
+  background: #2b563e !important;
+  color: #ffffff !important;
+  font-weight: 600 !important;
+  border-color: #244b36 !important;
+  box-shadow: 0 1px 3px rgba(35, 73, 50, 0.25);
 }
-.journal-tabbar > span {
+.journal-tab-pill[data-active]:after,
+.journal-tab-pill[data-state='active']:after {
+  display: none !important;
+}
+.tab-count-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 17px;
+  height: 17px;
+  padding: 0 5px;
+  border-radius: 10px;
+  font-size: 10px;
+  font-weight: 600;
+  background: #d8e6ce;
+  color: #385732;
+}
+.journal-tab-pill[data-active] .tab-count-badge,
+.journal-tab-pill[data-state='active'] .tab-count-badge {
+  background: rgba(255, 255, 255, 0.28);
+  color: #ffffff;
+}
+.word-count-badge {
   font-size: 11px;
-  color: #8b967e;
+  color: #798b70;
+  font-weight: 500;
+  background: #f3f7ef;
+  padding: 4px 10px;
+  border-radius: 12px;
+  border: 1px solid #e1e9db;
 }
 .conversation-content {
   padding: 24px 38px 15px;
@@ -2063,10 +2278,49 @@ h1 em {
   border-left: 1px solid #e3e9da;
   background: #f7f9f1;
 }
-.insights-heading .eyebrow {
+.insights-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+.insights-header-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.insights-eyebrow {
   font-size: 9px;
   letter-spacing: 1.3px;
-  color: #879876;
+  font-weight: 600;
+  color: #748865;
+  text-transform: uppercase;
+}
+.insights-pill {
+  font-size: 10px;
+  font-weight: 500;
+  background: #e4ecd9;
+  color: #436336;
+  padding: 2px 7px;
+  border-radius: 4px;
+}
+.insights-close-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  border: 1px solid #dce5d4;
+  background: #fdfefe;
+  color: #6b805c;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.insights-close-button:hover {
+  background: #eaf1e3;
+  color: #274320;
+  border-color: #cad8be;
 }
 .insights-heading h2 {
   font:
