@@ -180,6 +180,13 @@ function JournalApp({ onExit }: { onExit: () => void }) {
     } catch {}
     return () => lifecycle.abort();
   }, [navigate]);
+  useEffect(() => {
+    if (typeof document !== 'undefined') {
+      document.documentElement.setAttribute('data-theme', preferences.theme || 'sage');
+      document.documentElement.setAttribute('data-motif', preferences.backgroundMotif || 'none');
+    }
+  }, [preferences.theme, preferences.backgroundMotif]);
+
   return (
     <>
       <a
@@ -193,6 +200,8 @@ function JournalApp({ onExit }: { onExit: () => void }) {
         Skip to journal
       </a>
       <Sidebar
+        data-theme={preferences.theme || 'sage'}
+        data-motif={preferences.backgroundMotif || 'none'}
         className={'aura-sidebar ' + (focus ? 'sidebar-focus-hidden' : '')}
       >
         <SidebarHeader>
