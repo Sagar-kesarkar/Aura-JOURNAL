@@ -2,6 +2,7 @@
 /* oxlint-disable react/react-compiler -- Hydrates browser-owned data only after server rendering. */
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { toast } from 'sonner';
+import { trackWriting } from './journal-activity';
 import {
   readEntries,
   readDrafts,
@@ -205,6 +206,7 @@ export function useJournal(userId?: string) {
       return false;
     }
     try {
+      next = trackWriting(next, entries);
       saveEntries(localStorage, next);
       setEntries(next);
       if (userId) {
@@ -221,7 +223,7 @@ export function useJournal(userId?: string) {
       );
       return false;
     }
-  }, [userId]);
+  }, [userId, entries]);
   const patchPreferences = useCallback((patch: Partial<Preferences>) => {
     const next = { ...prefsRef.current, ...patch };
     try {

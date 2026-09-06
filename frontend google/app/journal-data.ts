@@ -12,6 +12,7 @@ export type Entry = {
   date: string;
   mode: string;
   tag: string;
+  activityAt?: string[];
   updatedAt?: string;
   createdAt?: string;
   sample?: boolean;
@@ -296,6 +297,7 @@ export function normalizeEntry(raw: any): Entry {
     tag,
     updatedAt: effectiveUpdatedAt,
     createdAt: effectiveCreatedAt,
+    activityAt: Array.isArray(raw.activityAt) ? [...new Set(raw.activityAt.filter((value: unknown): value is string => typeof value === 'string' && Number.isFinite(Date.parse(value))))] as string[] : undefined,
     sample: Boolean(raw.sample),
     messages,
   };

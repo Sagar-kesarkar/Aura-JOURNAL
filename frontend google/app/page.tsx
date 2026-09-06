@@ -1,4 +1,5 @@
 'use client';
+import { TreeLogo } from './tree-logo';
 import { useEffect, useState } from 'react';
 import { Toaster, toast } from 'sonner';
 import {
@@ -219,9 +220,9 @@ function JournalApp({ onExit }: { onExit: () => void }) {
         <SidebarHeader>
           <button className="brand" onClick={() => go('Overview')}>
             <span className="brand-mark">
-              <Feather size={23} />
+              <TreeLogo />
             </span>
-            aura<span className="brand-dot">.</span>
+            <span>aura<span className="brand-dot">.</span></span>
           </button>
           <p className="brand-caption">YOUR THOUGHTS. A LITTLE CLEARER.</p>
         </SidebarHeader>

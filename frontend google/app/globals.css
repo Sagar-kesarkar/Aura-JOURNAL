@@ -3705,3 +3705,49 @@ h1 em {
   font-size: 16px;
 }
 
+
+/* Shared Aura tree logo: approved compact header, large welcome emblem. */
+:root, [data-theme='sage'] { --tree-dark: #285c49; --tree-mid: #639451; --tree-highlight: #a8c578; }
+[data-theme='ocean'] { --tree-dark: #123c61; --tree-mid: #2f80c7; --tree-highlight: #8fc1e8; }
+[data-theme='linen'] { --tree-dark: #4a2f1d; --tree-mid: #c9772f; --tree-highlight: #e3a24c; }
+[data-theme='lavender'] { --tree-dark: #352a55; --tree-mid: #7c5cc9; --tree-highlight: #b7a2e8; }
+[data-theme='terracotta'] { --tree-dark: #7c2d12; --tree-mid: #c2410c; --tree-highlight: #fb923c; }
+[data-theme='midnight'] { --tree-dark: #38bdf8; --tree-mid: #7dd3fc; --tree-highlight: #bae6fd; }
+.tree-logo { display: block; width: 100%; height: 100%; }
+.tree-roots-dark, .tree-canopy-shadow { fill: var(--tree-dark); }
+.tree-canopy-mid { fill: var(--tree-mid); }
+.tree-canopy-highlight { fill: var(--tree-highlight); }
+.brand { gap: 9px; font-size: 32px; color: var(--tree-dark); }
+.welcome-header .brand { font-size: 30px; }
+.brand-mark { width: 30px; height: 32px; flex-shrink: 0; background: transparent; border-radius: 0; }
+.brand-dot { margin-left: 0; color: var(--tree-mid); }
+.welcome-emblem { width: 155px; height: 164px; background: transparent; border: 0; border-radius: 0; }
+
+/* Weekly writing rhythm and decorative thread connections follow every theme. */
+.activity-insight-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.activity-card { display: flex; flex-direction: column; gap: 9px; padding: 24px; background: var(--card); }
+.activity-card h2 { font: 22px/1.3 Georgia, serif; color: var(--foreground); margin: 0; }
+.activity-card > p { font-size: 13px; line-height: 1.65; color: var(--muted-foreground); margin: 0; }
+.activity-card > .text-button { margin-top: auto; padding-top: 12px; color: var(--primary); font-size: 13px; }
+.thread-landscape { display: block; width: 100%; height: 80px; margin: 2px 0; }
+.thread-landscape path { fill: none; stroke-width: 1.7; }
+.thread-line-main { stroke: var(--primary); }
+.thread-line-soft { stroke: var(--accent); opacity: 0.4; }
+.thread-node-main { fill: var(--primary); }
+.thread-node-soft { fill: var(--accent); opacity: 0.6; }
+.activity-week { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); list-style: none; margin: 15px 0 5px; padding: 0; gap: 8px; }
+.activity-week li { display: flex; flex-direction: column; align-items: center; gap: 12px; font-size: 11px; color: var(--muted-foreground); }
+.activity-day { display: block; width: 14px; height: 14px; border: 1px solid var(--muted-foreground); border-radius: 50%; background: transparent; }
+.activity-day.is-active { background: var(--primary); border-color: var(--primary); box-shadow: inset 0 0 0 2px var(--card); }
+.activity-week .is-future { opacity: 0.4; }
+.activity-card > .activity-explanation { font-size: 11px; }
+@media (max-width: 700px) { .activity-insight-grid { grid-template-columns: 1fr; } }
+
+/* Give recent-entry corner illustrations more presence without affecting other boxes. */
+.entry-card > .card-motif-overlay {
+  opacity: 0.65;
+}
+.entry-card > .card-motif-overlay .card-motif-tl { top: 2px; left: 2px; }
+.entry-card > .card-motif-overlay .card-motif-tr { top: 2px; right: 2px; }
+.entry-card > .card-motif-overlay .card-motif-bl { bottom: 2px; left: 2px; }
+.entry-card > .card-motif-overlay .card-motif-br { bottom: 2px; right: 2px; }

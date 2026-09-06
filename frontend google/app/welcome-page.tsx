@@ -1,4 +1,5 @@
 'use client';
+import { TreeLogo } from './tree-logo';
 import { useState } from 'react';
 import {
   ArrowRight,
@@ -32,9 +33,9 @@ export function WelcomePage({ onEnterDemo }: { onEnterDemo: () => void }) {
       <header className="welcome-header">
         <div className="brand" aria-label="Aura Journal">
           <span className="brand-mark">
-            <Feather size={23} />
+            <TreeLogo />
           </span>
-          aura<span className="brand-dot">.</span>
+          <span>aura<span className="brand-dot">.</span></span>
           <span className="welcome-brand-label">JOURNAL</span>
         </div>
         <span className="welcome-header-note">A LITTLE SPACE FOR YOURSELF</span>
@@ -42,7 +43,7 @@ export function WelcomePage({ onEnterDemo }: { onEnterDemo: () => void }) {
       <main className="welcome-main">
         <section className="welcome-intro" aria-labelledby="welcome-title">
           <span className="welcome-emblem">
-            <Feather size={30} strokeWidth={1.4} />
+            <TreeLogo />
           </span>
           <div className="eyebrow">
             <Sparkles size={14} /> YOUR THOUGHTS. A LITTLE CLEARER.

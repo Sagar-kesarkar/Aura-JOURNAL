@@ -445,7 +445,6 @@ export function Workbench({
         <CardMotif motif={motif} size={38} />
         <div className="journal-heading">
           <div className="journal-kicker">
-            <Feather size={16} />
             <span>{entry ? formatEntryDate(entry) : 'A NEW CHAPTER'}</span>
             <span className="dot" />
             <span>

@@ -13,6 +13,7 @@ import {
   CalendarDays,
 } from 'lucide-react';
 import { type Entry, type MotifId, formatEntryDate, readingMinutes } from './journal-data';
+import { weeklyActivity } from './journal-activity';
 import { CardMotif } from '@/components/background-motif';
 
 export function Overview({
@@ -25,6 +26,7 @@ export function Overview({
   motif?: MotifId;
 }) {
   const now = new Date();
+  const activity = weeklyActivity(entries, now);
   return (
     <>
       <div className="greeting">
@@ -91,7 +93,7 @@ export function Overview({
             key={e.id}
             onClick={() => navigate('entry:' + e.id)}
           >
-            <CardMotif motif={motif} size={28} />
+            <CardMotif motif={motif} size={38} />
             <div className="entry-meta">
               <span>
                 <BookOpen size={15} /> {formatEntryDate(e)}
@@ -119,52 +121,37 @@ export function Overview({
           </button>
         </div>
       )}
-      <div className="insight-grid">
-        <section className="thread-summary">
-          <div className="section-heading">
-            <h2>
-              <GitBranch size={19} /> The threads that connect
-            </h2>
-            <span className="small-label">SAMPLE INSIGHT</span>
-          </div>
+      <div className="insight-grid activity-insight-grid">
+        <section className="thread-summary activity-card">
+          <h2>The threads that connect</h2>
           <p>A few things you’ve been coming back to.</p>
-          <button
-            className="thread-row"
-            onClick={() => navigate('Recurring threads')}
-          >
-            <span className="thread-icon">
-              <GitBranch size={20} />
-            </span>
-            <div>
-              <h3>Making room for yourself</h3>
-              <p>Mentioned in 3 sample entries this week</p>
-            </div>
-            <ArrowUpRight size={18} />
-          </button>
-          <button
-            className="text-button"
-            onClick={() => navigate('Recurring threads')}
-          >
-            Explore your threads <ArrowRight size={15} />
+          <span className="small-label">SAMPLE THREADS</span>
+          <svg className="thread-landscape" viewBox="0 0 360 80" aria-hidden="true">
+            <path className="thread-line-main" d="M4 38 C35 7 58 75 91 45 S146 18 173 42 S220 59 249 32 S299 77 356 41" />
+            <path className="thread-line-soft" d="M4 50 C51 24 69 35 99 49 S152 69 187 30 S244 59 275 39 S324 18 356 48" />
+            <circle cx="66" cy="47" r="5" className="thread-node-main" />
+            <circle cx="187" cy="30" r="5" className="thread-node-soft" />
+            <circle cx="278" cy="36" r="5" className="thread-node-main" />
+          </svg>
+          <button className="text-button" onClick={() => navigate('Recurring threads')}>
+            Explore recurring threads <ArrowRight size={15} />
           </button>
         </section>
-        <section className="review-summary">
-          <div className="eyebrow">
-            <Sparkles size={16} /> YOUR WEEK, IN PERSPECTIVE
-          </div>
-          <h2>
-            A pause. A look back.
-            <br />A little clarity.
-          </h2>
-          <p>
-            See what stood out, what connected,
-            <br />
-            and a small next step worth taking.
-          </p>
-          <button onClick={() => navigate('Weekly review')}>
-            Open sample weekly review <ArrowUpRight size={17} />
+        <section className="review-summary activity-card">
+          <h2>Your week, in perspective</h2>
+          <p aria-live="polite">{activity.total === 0 ? 'Your next reflection starts this week’s rhythm.' : `You wrote ${activity.total} ${activity.total === 1 ? 'time' : 'times'} this week.`}<br />Keep showing up for yourself.</p>
+          <ol className="activity-week" aria-label="Journal activity this week, Monday to Sunday">
+            {activity.days.map((day, index) => <li key={index} className={day.future ? 'is-future' : ''}>
+              <span aria-hidden="true">{day.label}</span>
+              <span className={'activity-day ' + (day.count ? 'is-active' : '')} role="img"
+                aria-label={day.date.toLocaleDateString('en', { weekday: 'long', month: 'short', day: 'numeric' }) + ': ' + (day.future ? 'upcoming' : day.count + ' saved writing ' + (day.count === 1 ? 'change' : 'changes'))}
+                title={day.date.toLocaleDateString('en', { weekday: 'long', month: 'short', day: 'numeric' }) + ': ' + day.count + ' saved writing changes'} />
+            </li>)}
+          </ol>
+          <p className="activity-explanation">{activity.activeDays} of 7 days · Saved writing, including edits. Sample entries excluded.</p>
+          <button className="text-button" onClick={() => navigate('Weekly review')}>
+            See your weekly review <ArrowRight size={15} />
           </button>
-          <CalendarDays className="review-symbol" size={87} strokeWidth={0.8} />
         </section>
       </div>
       <footer className="page-footer">
